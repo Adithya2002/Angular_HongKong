@@ -15,7 +15,7 @@
           <h2 *ngIf = "dish">{{ dish.name | uppercase }}</h2>
         </mat-card-title>
       </mat-card-header>
-      <img mat-card-image src={{dish.image}} alt={{dish.name}}>
+      <img mat-card-image src= "{{ BaseURL + dish.image}}" alt={{dish.name}}>
       <mat-card-content>
         <p>{{ dish.description }}</p>
       </mat-card-content>
@@ -92,9 +92,14 @@
         <button [disabled] = "feedbackForm.invalid" type="submit" mat-button class="background-primary text-floral-white">Submit</button>
       </form>
     </mat-card>
-    <div fxflex [hidden] = "dish">
+    <div fxflex [hidden] = "dish || errMess">
       <mat-spinner></mat-spinner><h4>Loading.....Please Wait!</h4>
     </div>
+    <div fxFlex *ngIf="errMess">
+      <h2>Error</h2>
+      <h4>{{errMess}}</h4>
+    </div>
+    
   </div>
 
 </div>

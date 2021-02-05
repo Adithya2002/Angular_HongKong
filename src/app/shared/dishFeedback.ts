@@ -1,9 +1,9 @@
  export class DishFeedback{
 
-     author:String;
-     comment:String;
+     author:string;
+     comment:string;
      rating:number;
-     date:Date = new Date();
+     date:string;
      
 
  }

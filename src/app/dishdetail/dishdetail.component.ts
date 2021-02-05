@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild, Inject } from '@angular/core';
 import { Params, ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 import { Dish } from '../shared/dish';
@@ -41,14 +41,21 @@ export class DishdetailComponent implements OnInit {
   //  dish: Dish;
   dish:Dish;
 
+  dishcopy:Dish;
+
   //dish1 = DISHES;
   newArray = new Array(4)
 
   dishIds: string[];
   prev: string;
   next: string;
+  errMess: String;
 
-  constructor(private dishService:DishService, private route:ActivatedRoute, private location:Location, private fb: FormBuilder) {
+  constructor(private dishService:DishService, 
+    private route:ActivatedRoute, 
+    private location:Location, 
+    private fb: FormBuilder,  
+    @Inject('BaseURL') private BaseURL) {
     this.createForm();
    }
 
@@ -77,6 +84,8 @@ export class DishdetailComponent implements OnInit {
     
   };
 
+ 
+
    
   
 
@@ -95,10 +104,17 @@ export class DishdetailComponent implements OnInit {
 
    onSubmit() {
     this.feedback = this.feedbackForm.value;
+    this.feedback.date = new Date().toISOString();
     console.log(this.feedback);
     console.log(this.presentDate);
     this.newDishRating.push({author: this.feedback.author, comment: this.feedback.comment, rating: this.feedback.rating, date: this.presentDate})
-    
+    this.dishcopy.comments.push(this.feedback);
+    this.dishService.putDish(this.dishcopy)
+      .subscribe(dish => {
+        this.dish = dish; 
+      },
+      errmess => { this.dish = null; this.dishcopy = null; this.errMess = <any>errmess; });
+
     this.feedbackForm.reset({
       author: '',
       comment: '',
@@ -132,7 +148,7 @@ export class DishdetailComponent implements OnInit {
   ngOnInit() {
     this.dishService.getDishIds().subscribe(dishIds => this.dishIds = dishIds);
     this.route.params.pipe(switchMap((params: Params) => this.dishService.getDish(params['id'])))
-    .subscribe(dish => { this.dish = dish; this.setPrevNext(dish.id); });
+    .subscribe(dish => { this.dish = dish;this.dishcopy = dish; this.setPrevNext(dish.id); }, errmess => this.errMess = <any>errmess);
   }
 
   setPrevNext(dishId: string) {
