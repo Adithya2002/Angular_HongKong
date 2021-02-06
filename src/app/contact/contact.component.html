@@ -2,7 +2,26 @@
   <h3>Send us your Feedback</h3>
   <!-- <p>{{ feedbackForm.value | json }} {{ feedbackForm.status | json }}</p> -->
 
-  <form novalidate [formGroup]="feedbackForm" #fform="ngForm" (ngSubmit)="onSubmit()">
+  <mat-card *ngIf = 'userFeedback && show'>
+    
+    <!-- <mat-card-content > -->
+    <mat-card-content [@expand]>
+      <h1>Your submission</h1>
+      <p>First Name: {{userFeedback.firstname}}</p>
+      <p>Last Name: {{userFeedback.lastname}}</p>
+      <p>Tel.number: {{userFeedback.telnum}}</p>
+      <p>Email: {{userFeedback.email}}</p>
+      <p>Contact you? {{userFeedback.agree}}</p>
+      <p>How? {{userFeedback.contacttype}}</p>
+      <p>Feedback: {{userFeedback.message}}</p>
+    </mat-card-content>
+    <!-- </mat-card-content> -->
+  </mat-card>
+  <div fxflex *ngIf = 'showspinner'>
+    <mat-spinner></mat-spinner><h4>Loading.....Please Wait!</h4>
+  </div>
+
+  <form novalidate [formGroup]="feedbackForm" #fform="ngForm" (ngSubmit)="onSubmit()" *ngIf = '!show'>
     <p>
       <mat-form-field class="half-width">
         <input matInput formControlName="firstname" placeholder="First Name" type="text" required>

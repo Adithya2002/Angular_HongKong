@@ -2,11 +2,22 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Feedback, ContactType } from '../shared/feedback';
+import { FeedbackService } from '../services/feedback.service';
+
+import { flyInOut,expand } from '../animations/app.animation';
 
 @Component({
   selector: 'app-contact',
   templateUrl: './contact.component.html',
-  styleUrls: ['./contact.component.scss']
+  styleUrls: ['./contact.component.scss'],
+  host: {
+    '[@flyInOut]': 'true',
+    'style': 'display: block;'
+    },
+    animations: [
+      flyInOut(),
+      expand()
+    ]
 })
 export class ContactComponent implements OnInit {
 
@@ -15,8 +26,15 @@ export class ContactComponent implements OnInit {
   feedbackForm: FormGroup;
   feedback: Feedback;
   contactType = ContactType;
+  newFeedback = [{}];
+  userFeedback: Feedback;
+  show = false;
+  showspinner = false;
 
-  constructor(private fb: FormBuilder) { 
+  constructor(
+    private fb: FormBuilder,
+    private feedbackService: FeedbackService
+    ) { 
     this.createForm();
   }
 
@@ -69,6 +87,10 @@ export class ContactComponent implements OnInit {
 
   onSubmit() {
     this.feedback = this.feedbackForm.value;
+    this.show = !this.show;
+    this.showspinner = !this.showspinner;
+    // setTimeout(() => {this.show = !this.show},5000)
+    setTimeout(() => {this.show = !this.show}, 6000)
     console.log(this.feedback);
     this.feedbackForm.reset({
       firstname: '',
@@ -79,6 +101,17 @@ export class ContactComponent implements OnInit {
       contacttype: 'None',
       message: ''
     });
+    this.newFeedback.push({
+      firstname: this.feedback.firstname,
+      lastname: this.feedback.lastname,
+      telnum: this.feedback.telnum,
+      email: this.feedback.email,
+      agree: this.feedback.agree,
+      contacttype: this.feedback.contacttype,
+      message: this.feedback.message
+    })
+    this.feedbackService.submitFeedback(this.feedback).subscribe(feedback => {this.showspinner = !this.showspinner;this.userFeedback = feedback} );
+  
     this.feedbackFormDirective.resetForm();
   }
 
